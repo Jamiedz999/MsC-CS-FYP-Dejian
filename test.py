@@ -1,5 +1,6 @@
 import Levenshtein
 
+
 # removing punctuations and numbers
 sym_and_num = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 
@@ -14,6 +15,14 @@ def tokenization(line):
     if line.endswith('.'):
         line = line[:-1]
     line = line.lower()
+    words = line.split()
+    total_words += words
+    return total_words
+
+
+
+def tokenization1(line):
+    total_words = []
     words = line.split()
     total_words += words
     return total_words
@@ -80,7 +89,10 @@ def main():
     source_file = "BaileInScáil_BothMSS_2.1.txt"
     with open(source_file, "r", encoding="utf-8") as file:
         for line in file:
+
             source_words = tokenization(line)
+
+
 
     with open(target_file, "r", encoding="utf-8") as file:
         for line in file:
@@ -88,10 +100,13 @@ def main():
 
             window_size = len(target_words)
             
+            
             min_score_index, min_score = moving_window_similarity1(target_words, source_words, window_size)
             print("=========================")
             print(line)
-            print(" ".join(source_words[min_score_index:min_score_index+window_size]))
+
+            result = " ".join(source_words[min_score_index:min_score_index+window_size])
+            print(result)
 
     # target_words = tokenization("In tan iarum ba lan ind arim sin ro iarfacht conn a frithisi dond ḟilid 7 ro buiside icc scrutan co nécetar a eochra eccsi dou.")
     # source_words = tokenization("conn ni slondad do co cent .l. laithi tri. in tan ro cindiod an airiom sin. rusiarfacht conn don drai afridhisi. is ann")
