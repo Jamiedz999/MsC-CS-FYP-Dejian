@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload and Display</title>
+    <style>
+        .article-box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow: auto;
+            max-height: 500px;
+        }
+        .highlight {
+            background-color: red;
+            color: white; 
+        }
+        #searchInput {
+    width: 600px;
+    height: 40px; /* 可选：设置固定高度 */
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    box-sizing: border-box; 
+}
+    </style>
+</head>
+<body>
+    <h1>Upload article</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".txt"><br><br>
+        <input type="submit" value="Upload">
+    </form>
+
+    {% if content %}
+    <h2>Content:</h2>
+    <div class="article-box" id="articleContent">
+        {% if highlighted_sentence %}
+            {{ content.replace(highlighted_sentence, '<span class="highlight">' + highlighted_sentence + '</span>') | safe }}
+        {% else %}
+            {{ content }}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <hr>
+
+    <h4>Search similart sentences</h4>
+    <div>
+        <input type="text" id="searchInput" name="search_text" placeholder="Input a sentence">
+        <button onclick="searchArticle()">Search</button>
+    </div>
+
+    <script>
+        function searchArticle() {
+            const searchText = document.getElementById('searchInput').value;
+            fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `search_text=${searchText}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                const articleContentDiv = document.getElementById('articleContent');
+                if (articleContentDiv && data.highlighted_sentence) {
+                    const content = articleContentDiv.textContent;
+
+                    const highlightedHTML = content.replace(data.highlighted_sentence, `<span class="highlight">${data.highlighted_sentence}</span>`);
+                    articleContentDiv.innerHTML = highlightedHTML;
+                } else if (articleContentDiv) {
+
+                    articleContentDiv.innerHTML = articleContentDiv.textContent;
+                }
+            })
+            .catch(error => {
+                console.error('Failed:', error);
+            });
+        }
+    </script>
+</body>
+</html>
